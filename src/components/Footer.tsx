@@ -9,7 +9,7 @@ export default function Footer() {
           <div className="space-y-4">
             <Link to="/" className="flex items-center gap-2">
               <div className="rounded-full w-8 h-8 bg-white flex items-center justify-center">
-                <span className="text-elevate-purple font-bold">EV</span>
+              <img src="\elevate-venture.png" alt="logo" />
               </div>
               <span className="font-display text-xl font-semibold tracking-tight text-white">Elevate<span className="text-elevate-gold">Ventures</span></span>
             </Link>

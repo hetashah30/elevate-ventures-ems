@@ -67,7 +67,7 @@ export default function Hero() {
             <Button 
               size="lg" 
               variant="outline" 
-              className="border-white text-white hover:bg-white/10 group"
+              className="border-white text-green hover:bg-white/10 group"
             >
               <PartyPopper className="mr-2 h-4 w-4 transition-transform group-hover:rotate-12" />
               Start Planning
