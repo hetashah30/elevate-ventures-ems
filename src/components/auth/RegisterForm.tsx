@@ -1,151 +1,187 @@
-
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { toast } from 'sonner';
-import { motion } from 'framer-motion';
-import { useFormValidation } from '@/hooks/useFormValidation';
+// src/components/auth/RegisterForm.tsx
+import React, { useState } from "react";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+import { auth, db } from "../../lib/firebase";
 
 interface RegisterFormProps {
-  isLoading: boolean;
-  setIsLoading: (value: boolean) => void;
-  onSuccess: (email: string) => void;
+  onToggleForm: () => void;
 }
 
-export default function RegisterForm({ isLoading, setIsLoading, onSuccess }: RegisterFormProps) {
-  const { validateRegisterForm } = useFormValidation();
+const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleForm }) => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
-  const [errors, setErrors] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string>("");
+  const [success, setSuccess] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    setErrors(prev => ({ ...prev, [name]: '' }));
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const { isValid, errors } = validateRegisterForm(
-      formData.name,
-      formData.email,
-      formData.password,
-      formData.confirmPassword
-    );
-    
-    if (!isValid) {
-      setErrors(errors);
-      return;
-    }
-    
-    setIsLoading(true);
-    
+    // ... validation code ...
+
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      toast.success('Registration successful! Please log in.');
-      onSuccess(formData.email);
-    } catch (error) {
-      toast.error('Registration failed. Please try again later.');
+      setError("");
+      setLoading(true);
+
+      // Create user with email and password
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
+      );
+      const user = userCredential.user;
+
+      // Save additional user info to Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        createdAt: new Date(),
+        uid: user.uid,
+      });
+
+      // Optionally update user profile
+      await updateProfile(user, {
+        displayName: `${formData.firstName} ${formData.lastName}`,
+      });
+
+      setSuccess(true);
+      setTimeout(() => {
+        onToggleForm();
+      }, 2000);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || "Failed to create account");
+      } else {
+        setError("Failed to create account");
+      }
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
+  if (success) {
+    return (
+      <div className="text-center">
+        <div className="rounded-md bg-green-50 p-4">
+          <div className="text-sm text-green-700">
+            Account created successfully! Redirecting to login...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ delay: 0.2 }}
-    >
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <CardHeader>
-          <CardTitle>Create an Account</CardTitle>
-          <CardDescription>Enter your details to register</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="register-name">Name</Label>
-            <Input 
-              id="register-name" 
-              name="name" 
-              placeholder="John Doe" 
-              value={formData.name}
+    <form className="mt-8 space-y-20" onSubmit={handleSubmit}>
+      {error && (
+        <div className="rounded-md bg-red-50 p-4">
+          <div className="text-sm text-red-700">{error}</div>
+        </div>
+      )}
+
+      <div className="rounded-md shadow-sm space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="firstName" className="sr-only">
+              First Name
+            </label>
+            <input
+              id="firstName"
+              name="firstName"
+              type="text"
+              required
+              className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              placeholder="First Name"
+              value={formData.firstName}
               onChange={handleChange}
-              disabled={isLoading}
             />
-            {errors.name && (
-              <p className="text-xs text-destructive">{errors.name}</p>
-            )}
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="register-email">Email</Label>
-            <Input 
-              id="register-email" 
-              name="email" 
-              type="email" 
-              placeholder="your@email.com" 
-              value={formData.email}
+          <div>
+            <label htmlFor="lastName" className="sr-only">
+              Last Name
+            </label>
+            <input
+              id="lastName"
+              name="lastName"
+              type="text"
+              required
+              className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              placeholder="Last Name"
+              value={formData.lastName}
               onChange={handleChange}
-              disabled={isLoading}
             />
-            {errors.email && (
-              <p className="text-xs text-destructive">{errors.email}</p>
-            )}
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="register-password">Password</Label>
-            <Input 
-              id="register-password" 
-              name="password" 
-              type="password" 
-              placeholder="••••••••" 
-              value={formData.password}
-              onChange={handleChange}
-              disabled={isLoading}
-            />
-            {errors.password && (
-              <p className="text-xs text-destructive">{errors.password}</p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="register-confirm-password">Confirm Password</Label>
-            <Input 
-              id="register-confirm-password" 
-              name="confirmPassword" 
-              type="password" 
-              placeholder="••••••••" 
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              disabled={isLoading}
-            />
-            {errors.confirmPassword && (
-              <p className="text-xs text-destructive">{errors.confirmPassword}</p>
-            )}
-          </div>
-        </CardContent>
-        <CardFooter>
-          <Button 
-            type="submit" 
-            className="w-full bg-elevate-purple hover:bg-elevate-purple/90"
-            disabled={isLoading}
-          >
-            {isLoading ? "Registering..." : "Register"}
-          </Button>
-        </CardFooter>
-      </form>
-    </motion.div>
+        </div>
+
+        <div>
+          <label htmlFor="email" className="sr-only">
+            Email address
+          </label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            autoComplete="email"
+            required
+            className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            placeholder="Email address"
+            value={formData.email}
+            onChange={handleChange}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="password" className="sr-only">
+            Password
+          </label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            autoComplete="new-password"
+            required
+            className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            placeholder="Password (min. 6 characters)"
+            value={formData.password}
+            onChange={handleChange}
+          />
+        </div>
+      </div>
+
+      <div>
+        <button
+          type="submit"
+          disabled={loading}
+          className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {loading ? "Creating account..." : "Create account"}
+        </button>
+      </div>
+
+      <div className="text-center">
+        <button
+          type="button"
+          onClick={onToggleForm}
+          className="font-medium text-indigo-600 hover:text-indigo-500"
+        >
+          Already have an account? Sign in
+        </button>
+      </div>
+    </form>
   );
-}
+};
+
+export default RegisterForm;

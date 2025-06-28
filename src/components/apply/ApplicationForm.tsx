@@ -1,94 +1,32 @@
-// import { useState } from 'react';
-// import { useNavigate } from 'react-router-dom';
-// import { Button } from "@/components/ui/button";
-// import { Input } from "@/components/ui/input";
-// import { Textarea } from "@/components/ui/textarea";
-// import { Label } from "@/components/ui/label";
-// import { Calendar } from "@/components/ui/calendar";
-// import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-// import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
-// import { format } from "date-fns";
-// import { Calendar as CalendarIcon } from "lucide-react";
-// import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-// import { Card, CardContent } from "@/components/ui/card";
-// import { toast } from 'sonner';
-// import { cn } from '@/lib/utils';
-
-// export default function ApplicationForm() {
-//   const navigate = useNavigate();
-//   const [isSubmitting, setIsSubmitting] = useState(false);
-//   const [date, setDate] = useState<Date | undefined>();
-  
-//   const [formData, setFormData] = useState({
-//     name: '',
-//     email: '',
-//     phone: '',
-//     eventType: '',
-//     guestCount: '',
-//     budget: '',
-//     venuePreference: '',
-//     additionalNotes: '',
-//   });
-
-//   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-//     const { name, value } = e.target;
-//     setFormData(prev => ({ ...prev, [name]: value }));
-//   };
-
-//   const handleSelectChange = (name: string, value: string) => {
-//     setFormData(prev => ({ ...prev, [name]: value }));
-//   };
-
-//   const handleSubmit = async (e: React.FormEvent) => {
-//     e.preventDefault();
-    
-//     // Validate form data
-//     if (!formData.name || !formData.email || !formData.phone || !formData.eventType || !date) {
-//       toast.error("Please fill out all required fields.");
-//       return;
-//     }
-    
-//     setIsSubmitting(true);
-    
-//     try {
-//       // Simulate API call
-//       await new Promise(resolve => setTimeout(resolve, 2000));
-      
-//       // In a real app, you would submit to your backend here
-//       console.log("Form submitted:", { ...formData, eventDate: date });
-      
-//       toast.success("Your application has been submitted successfully! We'll be in touch soon.");
-      
-//       // Redirect to thank you page or home
-//       setTimeout(() => navigate('/'), 2000);
-//     } catch (error) {
-//       toast.error("Something went wrong. Please try again later.");
-//     } finally {
-//       setIsSubmitting(false);
-//     }
-//   };
-
-// const handleBudgetSelect = (budget: string) => {
-//   setFormData(prev => ({ ...prev, budget }));
-// };
-
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ref, push } from 'firebase/database';
-import { db } from '@/firebaseConfig';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { ref, push } from "firebase/database";
+import { formDb } from "../../firebaseConfig";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card, CardContent } from "@/components/ui/card";
-import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 export default function ApplicationForm() {
   const navigate = useNavigate();
@@ -96,33 +34,41 @@ export default function ApplicationForm() {
   const [date, setDate] = useState<Date | undefined>();
 
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    eventType: '',
-    guestCount: '',
-    budget: '',
-    venuePreference: '',
-    additionalNotes: '',
+    name: "",
+    email: "",
+    phone: "",
+    eventType: "",
+    guestCount: "",
+    budget: "",
+    venuePreference: "",
+    additionalNotes: "",
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSelectChange = (name: string, value: string) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleBudgetSelect = (budget: string) => {
-    setFormData(prev => ({ ...prev, budget }));
+    setFormData((prev) => ({ ...prev, budget }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.email || !formData.phone || !formData.eventType || !date) {
+    if (
+      !formData.name ||
+      !formData.email ||
+      !formData.phone ||
+      !formData.eventType ||
+      !date
+    ) {
       toast.error("Please fill out all required fields.");
       return;
     }
@@ -130,29 +76,31 @@ export default function ApplicationForm() {
     setIsSubmitting(true);
 
     try {
-      const applicationRef = ref(db, 'applications');
+      const applicationRef = ref(formDb, "applications");
       await push(applicationRef, {
         ...formData,
         eventDate: date.toISOString(),
-        submittedAt: new Date().toISOString()
+        submittedAt: new Date().toISOString(),
       });
 
-      toast.success("Your application has been submitted successfully! We'll be in touch soon.");
+      toast.success(
+        "Your application has been submitted successfully! We'll be in touch soon."
+      );
 
-      setTimeout(() => navigate('/'), 2000);
+      setTimeout(() => navigate("/"), 2000);
     } catch (error) {
+      console.error("Error submitting form:", error);
       toast.error("Something went wrong. Please try again later.");
-    } finally {
-      setIsSubmitting(false);
     }
   };
-
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <Label htmlFor="name">Full Name <span className="text-destructive">*</span></Label>
+          <Label htmlFor="name">
+            Full Name <span className="text-destructive">*</span>
+          </Label>
           <Input
             id="name"
             name="name"
@@ -163,9 +111,11 @@ export default function ApplicationForm() {
             required
           />
         </div>
-        
+
         <div className="space-y-2">
-          <Label htmlFor="email">Email Address <span className="text-destructive">*</span></Label>
+          <Label htmlFor="email">
+            Email Address <span className="text-destructive">*</span>
+          </Label>
           <Input
             id="email"
             name="email"
@@ -177,9 +127,11 @@ export default function ApplicationForm() {
             required
           />
         </div>
-        
+
         <div className="space-y-2">
-          <Label htmlFor="phone">Phone Number <span className="text-destructive">*</span></Label>
+          <Label htmlFor="phone">
+            Phone Number <span className="text-destructive">*</span>
+          </Label>
           <Input
             id="phone"
             name="phone"
@@ -190,9 +142,11 @@ export default function ApplicationForm() {
             required
           />
         </div>
-        
+
         <div className="space-y-2">
-          <Label htmlFor="eventDate">Event Date <span className="text-destructive">*</span></Label>
+          <Label htmlFor="eventDate">
+            Event Date <span className="text-destructive">*</span>
+          </Label>
           <Popover>
             <PopoverTrigger asChild>
               <Button
@@ -219,10 +173,12 @@ export default function ApplicationForm() {
           </Popover>
         </div>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <Label htmlFor="eventType">Event Type <span className="text-destructive">*</span></Label>
+          <Label htmlFor="eventType">
+            Event Type <span className="text-destructive">*</span>
+          </Label>
           <Select
             disabled={isSubmitting}
             onValueChange={(value) => handleSelectChange("eventType", value)}
@@ -244,7 +200,7 @@ export default function ApplicationForm() {
             </SelectContent>
           </Select>
         </div>
-        
+
         <div className="space-y-2">
           <Label htmlFor="guestCount">Estimated Guest Count</Label>
           <Select
@@ -264,15 +220,15 @@ export default function ApplicationForm() {
           </Select>
         </div>
       </div>
-      
+
       <div className="space-y-4">
         <Label>Budget Range</Label>
-        <RadioGroup 
-          defaultValue={formData.budget} 
+        <RadioGroup
+          defaultValue={formData.budget}
           className="grid grid-cols-1 md:grid-cols-3 gap-4"
           onValueChange={handleBudgetSelect}
         >
-          <Card 
+          <Card
             className={cn(
               "cursor-pointer relative border-2 transition-all hover:shadow",
               formData.budget === "economy" && "border-elevate-purple"
@@ -285,21 +241,20 @@ export default function ApplicationForm() {
               className="sr-only"
               disabled={isSubmitting}
             />
-            <Label
-              htmlFor="budget-economy"
-              className="cursor-pointer"
-            >
+            <Label htmlFor="budget-economy" className="cursor-pointer">
               <CardContent className="p-6">
                 <div className="font-display font-semibold">Economy</div>
                 <p className="text-sm text-muted-foreground mt-2">
                   Basic event planning with essential services
                 </p>
-                <div className="mt-4 text-elevate-purple font-medium">$1,000 - $5,000</div>
+                <div className="mt-4 text-elevate-purple font-medium">
+                  $1,000 - $5,000
+                </div>
               </CardContent>
             </Label>
           </Card>
-          
-          <Card 
+
+          <Card
             className={cn(
               "cursor-pointer relative border-2 transition-all hover:shadow",
               formData.budget === "standard" && "border-elevate-purple"
@@ -312,21 +267,20 @@ export default function ApplicationForm() {
               className="sr-only"
               disabled={isSubmitting}
             />
-            <Label
-              htmlFor="budget-standard"
-              className="cursor-pointer"
-            >
+            <Label htmlFor="budget-standard" className="cursor-pointer">
               <CardContent className="p-6">
                 <div className="font-display font-semibold">Standard</div>
                 <p className="text-sm text-muted-foreground mt-2">
                   Complete event management with premium touches
                 </p>
-                <div className="mt-4 text-elevate-purple font-medium">$5,000 - $15,000</div>
+                <div className="mt-4 text-elevate-purple font-medium">
+                  $5,000 - $15,000
+                </div>
               </CardContent>
             </Label>
           </Card>
-          
-          <Card 
+
+          <Card
             className={cn(
               "cursor-pointer relative border-2 transition-all hover:shadow",
               formData.budget === "luxury" && "border-elevate-purple"
@@ -339,27 +293,28 @@ export default function ApplicationForm() {
               className="sr-only"
               disabled={isSubmitting}
             />
-            <Label
-              htmlFor="budget-luxury"
-              className="cursor-pointer"
-            >
+            <Label htmlFor="budget-luxury" className="cursor-pointer">
               <CardContent className="p-6">
                 <div className="font-display font-semibold">Luxury</div>
                 <p className="text-sm text-muted-foreground mt-2">
                   Exclusive high-end event with luxurious details
                 </p>
-                <div className="mt-4 text-elevate-purple font-medium">$15,000+</div>
+                <div className="mt-4 text-elevate-purple font-medium">
+                  $15,000+
+                </div>
               </CardContent>
             </Label>
           </Card>
         </RadioGroup>
       </div>
-      
+
       <div className="space-y-2">
         <Label htmlFor="venuePreference">Venue Preference</Label>
         <Select
           disabled={isSubmitting}
-          onValueChange={(value) => handleSelectChange("venuePreference", value)}
+          onValueChange={(value) =>
+            handleSelectChange("venuePreference", value)
+          }
         >
           <SelectTrigger>
             <SelectValue placeholder="Select venue type" />
@@ -368,13 +323,17 @@ export default function ApplicationForm() {
             <SelectItem value="indoor">Indoor</SelectItem>
             <SelectItem value="outdoor">Outdoor</SelectItem>
             <SelectItem value="both">Combination of Both</SelectItem>
-            <SelectItem value="undecided">Undecided / Need Suggestions</SelectItem>
+            <SelectItem value="undecided">
+              Undecided / Need Suggestions
+            </SelectItem>
           </SelectContent>
         </Select>
       </div>
-      
+
       <div className="space-y-2">
-        <Label htmlFor="additionalNotes">Additional Notes or Requirements</Label>
+        <Label htmlFor="additionalNotes">
+          Additional Notes or Requirements
+        </Label>
         <Textarea
           id="additionalNotes"
           name="additionalNotes"
@@ -385,10 +344,10 @@ export default function ApplicationForm() {
           disabled={isSubmitting}
         />
       </div>
-      
+
       <div className="flex justify-end">
-        <Button 
-          type="submit" 
+        <Button
+          type="submit"
           className="bg-elevate-purple hover:bg-elevate-purple/90 px-10 py-6 text-lg"
           disabled={isSubmitting}
         >

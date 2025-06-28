@@ -1,28 +1,44 @@
+import React, { useState, useEffect } from "react";
+import LoginForm from "./LoginForm";
+import RegisterForm from "./RegisterForm";
 
-import { useState } from 'react';
-import LoginForm from './LoginForm';
-import RegisterForm from './RegisterForm';
-import { TabLayout } from './TabLayout';
+interface AuthFormProps {
+  initialMode?: string | null;
+}
 
-export default function AuthForm() {
-  const [isLoading, setIsLoading] = useState(false);
-  
-  const handleRegistrationSuccess = (email: string) => {
-    document.getElementById('login-tab')?.click();
+const AuthForm: React.FC<AuthFormProps> = ({ initialMode }) => {
+  const [isLogin, setIsLogin] = useState(true);
+
+  // Set initial mode based on URL parameter
+  useEffect(() => {
+    if (initialMode === "signup") {
+      setIsLogin(false);
+    } else {
+      setIsLogin(true);
+    }
+  }, [initialMode]);
+
+  const toggleForm = () => {
+    setIsLogin(!isLogin);
   };
 
   return (
-    <TabLayout 
-      loginContent={
-        <LoginForm isLoading={isLoading} setIsLoading={setIsLoading} />
-      }
-      registerContent={
-        <RegisterForm 
-          isLoading={isLoading} 
-          setIsLoading={setIsLoading} 
-          onSuccess={handleRegistrationSuccess}
-        />
-      }
-    />
+    <div className="max-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-purple-100 to-purple-200">
+      <div className="max-w-md w-full space-y-8">
+        <div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 bg-gradient-to-r from-purple-100 to-purple-200">
+            {isLogin ? "Sign in to your account" : "Create your account"}
+          </h2>
+        </div>
+
+        {isLogin ? (
+          <LoginForm onToggleForm={toggleForm} />
+        ) : (
+          <RegisterForm onToggleForm={toggleForm} />
+        )}
+      </div>
+    </div>
   );
-}
+};
+
+export default AuthForm;

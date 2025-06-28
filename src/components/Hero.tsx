@@ -1,8 +1,7 @@
-
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { motion } from 'framer-motion';
-import { PartyPopper, Sparkles } from 'lucide-react';
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+import { PartyPopper, Sparkles } from "lucide-react";
 
 export default function Hero() {
   return (
@@ -45,7 +44,9 @@ export default function Hero() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto mb-8 drop-shadow"
         >
-          Let us transform your vision into an extraordinary experience. From corporate events to personal celebrations, we bring your dreams to life.
+          Let us transform your vision into an extraordinary experience. From
+          corporate events to personal celebrations, we bring your dreams to
+          life.
         </motion.p>
 
         <motion.div
@@ -55,8 +56,8 @@ export default function Hero() {
           className="flex flex-col sm:flex-row gap-4 justify-center"
         >
           <Link to="/gallery">
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               className="bg-elevate-gold hover:bg-elevate-gold/90 text-elevate-dark px-8 group"
             >
               <Sparkles className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
@@ -64,10 +65,10 @@ export default function Hero() {
             </Button>
           </Link>
           <Link to="/apply">
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="border-white text-green hover:bg-white/10 group"
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-white text-green hover:bg-white/80 group"
             >
               <PartyPopper className="mr-2 h-4 w-4 transition-transform group-hover:rotate-12" />
               Start Planning

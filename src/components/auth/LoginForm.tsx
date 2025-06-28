@@ -1,127 +1,108 @@
-
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { toast } from 'sonner';
-import { motion } from 'framer-motion';
-import { useFormValidation } from '@/hooks/useFormValidation';
+import React, { useState } from "react";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../lib/firebase";
+import { useNavigate } from "react-router-dom";
 
 interface LoginFormProps {
-  isLoading: boolean;
-  setIsLoading: (value: boolean) => void;
+  onToggleForm: () => void;
 }
 
-export default function LoginForm({ isLoading, setIsLoading }: LoginFormProps) {
+const LoginForm: React.FC<LoginFormProps> = ({ onToggleForm }) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { validateLoginForm } = useFormValidation();
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
-  const [errors, setErrors] = useState({
-    email: '',
-    password: '',
-  });
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    setErrors(prev => ({ ...prev, [name]: '' }));
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const { isValid, errors } = validateLoginForm(formData.email, formData.password);
-    if (!isValid) {
-      setErrors(errors);
+
+    if (!email || !password) {
+      setError("Please fill in all fields");
       return;
     }
-    
-    setIsLoading(true);
-    
+
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      const userData = {
-        email: formData.email,
-        lastLogin: new Date().toISOString(),
-        isAuthenticated: true
-      };
-      
-      localStorage.setItem('user', JSON.stringify(userData));
-      
-      toast.success('Login successful! Welcome back.');
-      navigate('/', { replace: true });
-    } catch (error) {
-      toast.error('Login failed. Please check your credentials and try again.');
-      localStorage.removeItem('user');
+      setError("");
+      setLoading(true);
+      await signInWithEmailAndPassword(auth, email, password);
+      // Redirect to home page after successful login
+      navigate("/");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Failed to sign in");
+      }
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ delay: 0.2 }}
-    >
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <CardHeader>
-          <CardTitle>Welcome Back</CardTitle>
-          <CardDescription>Enter your credentials to access your account</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="login-email">Email</Label>
-            <Input 
-              id="login-email" 
-              name="email" 
-              type="email" 
-              placeholder="your@email.com" 
-              value={formData.email}
-              onChange={handleChange}
-              disabled={isLoading}
-            />
-            {errors.email && (
-              <p className="text-xs text-destructive">{errors.email}</p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="login-password">Password</Label>
-              <a href="#" className="text-xs text-elevate-purple hover:underline">
-                Forgot password?
-              </a>
-            </div>
-            <Input 
-              id="login-password" 
-              name="password" 
-              type="password" 
-              placeholder="••••••••" 
-              value={formData.password}
-              onChange={handleChange}
-              disabled={isLoading}
-            />
-            {errors.password && (
-              <p className="text-xs text-destructive">{errors.password}</p>
-            )}
-          </div>
-        </CardContent>
-        <CardFooter>
-          <Button 
-            type="submit" 
-            className="w-full bg-elevate-purple hover:bg-elevate-purple/90"
-            disabled={isLoading}
-          >
-            {isLoading ? "Logging in..." : "Login"}
-          </Button>
-        </CardFooter>
-      </form>
-    </motion.div>
+    <form className="space-y-20" onSubmit={handleSubmit}>
+      {error && (
+        <div className="rounded-md bg-red-50 p-4">
+          <div className="text-sm text-red-700">{error}</div>
+        </div>
+      )}
+
+      <div className="rounded-md shadow-sm -space-y-px">
+        <div>
+          <label htmlFor="email-address" className="sr-only">
+            Email address
+          </label>
+          <input
+            id="email-address"
+            name="email"
+            type="email"
+            autoComplete="email"
+            required
+            className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+            placeholder="Email address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+        <div>
+          <label htmlFor="password" className="sr-only">
+            Password
+          </label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            autoComplete="current-password"
+            required
+            className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm mt-5"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+      </div>
+
+      <div>
+        <button
+          type="submit"
+          disabled={loading}
+          className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {loading ? "Signing in..." : "Sign in"}
+        </button>
+      </div>
+
+      <div className="text-center">
+        <button
+          type="button"
+          onClick={onToggleForm}
+          className="font-medium text-indigo-600 hover:text-indigo-500"
+        >
+          Don't have an account? Sign up
+        </button>
+      </div>
+    </form>
   );
-}
+};
+
+export default LoginForm;

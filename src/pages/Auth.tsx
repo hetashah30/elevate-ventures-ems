@@ -1,32 +1,29 @@
-
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import AuthForm from '@/components/auth/AuthForm';
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Sparkles } from 'lucide-react';
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import AuthForm from "@/components/auth/AuthForm";
+import { useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Sparkles } from "lucide-react";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "@/lib/firebase";
 
 const Auth = () => {
   const navigate = useNavigate();
-  
-  // Check for existing authentication
+  const [searchParams] = useSearchParams();
+  const mode = searchParams.get("mode"); // 'login' or 'signup'
+
+  // Check for Firebase authentication state
   useEffect(() => {
-    const checkAuth = () => {
-      const userStr = localStorage.getItem('user');
-      if (userStr) {
-        try {
-          const user = JSON.parse(userStr);
-          if (user.isAuthenticated) {
-            navigate('/');
-          }
-        } catch {
-          localStorage.removeItem('user');
-        }
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is signed in
+        navigate("/");
       }
-    };
-    
-    checkAuth();
+    });
+
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
   }, [navigate]);
 
   return (
@@ -61,7 +58,7 @@ const Auth = () => {
               className="absolute -right-10 top-60 h-24 w-24 bg-elevate-purple opacity-10 rounded-full"
             />
           </motion.div>
-          
+
           <div className="container relative z-10">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -74,12 +71,14 @@ const Auth = () => {
                 <Sparkles className="h-6 w-6 text-elevate-gold" />
               </h1>
               <p className="text-muted-foreground">
-                Sign in to your account or create a new one to access personalized event planning services.
+                {mode === "signup"
+                  ? "Create your account to access personalized event planning services."
+                  : "Sign in to your account or create a new one to access personalized event planning services."}
               </p>
             </motion.div>
-            
+
             <div className="max-w-md mx-auto">
-              <AuthForm />
+              <AuthForm initialMode={mode} />
             </div>
           </div>
         </div>
@@ -87,6 +86,6 @@ const Auth = () => {
       <Footer />
     </div>
   );
-}
+};
 
 export default Auth;

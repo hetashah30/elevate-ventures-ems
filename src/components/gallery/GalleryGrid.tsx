@@ -11,7 +11,7 @@ const events = [
     description: "Annual corporate gala celebrating industry achievements",
     date: "March 15, 2024",
     category: "Corporate",
-    image: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    image: "https://www.augustawards.com/wp-content/uploads/2024/02/British-Business-Excellence-Awards-with-Lloyds-Bank-Finalists-and-Winners-0W5A1792-Enhanced-NR.jpg",
   },
   {
     id: 2,
@@ -19,7 +19,7 @@ const events = [
     description: "Elegant beachside wedding ceremony",
     date: "February 12, 2024",
     category: "Wedding",
-    image: "https://images.unsplash.com/photo-1519741497674-611481863552?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    image: "https://www.grandweddings.co.in/wp-content/uploads/2020/01/Top-Wedding-Event-Management-Companies-in-Hyderabad.jpg",
   },
   {
     id: 3,
@@ -27,7 +27,7 @@ const events = [
     description: "Revolutionary tech product unveiling event",
     date: "January 28, 2024",
     category: "Product Launch",
-    image: "https://images.unsplash.com/photo-1556761175-b413da4baf72?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    image: "https://miro.medium.com/v2/resize:fit:4000/1*rfNiNUVSKMAocn_HUKUFhg.jpeg",
   },
   {
     id: 4,
@@ -35,7 +35,7 @@ const events = [
     description: "Magical night for a special birthday celebration",
     date: "December 10, 2023",
     category: "Birthday",
-    image: "https://images.unsplash.com/photo-1533294455009-a77b7557d2d1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    image: "https://kitchendocs.com/wp-content/uploads/2021/10/BohoChicSweet16_Backyard_Party_View.jpg",
   },
   {
     id: 5,
@@ -43,7 +43,7 @@ const events = [
     description: "Fundraising event for local community initiatives",
     date: "November 25, 2023",
     category: "Charity",
-    image: "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    image: "https://gulfforgood.org/wp-content/uploads/2024/05/G4G-Gala-2022-161-700x465.jpg",
   },
   {
     id: 6,
@@ -75,7 +75,7 @@ const events = [
     description: "Runway event for upcoming designer collections",
     date: "August 20, 2023",
     category: "Fashion",
-    image: "https://images.unsplash.com/photo-1509812354997-610803a750bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    image: "https://www.couturefashionweek.com/wp-content/uploads/2015/03/cfw-runway3.jpg",
   }
 ];
 
