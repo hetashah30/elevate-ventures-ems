@@ -2,7 +2,7 @@
 
 **Transforming Campus Events into Seamless Digital Experiences**
 
-[🔗 Live Website](https://event-management-system-heta-shahs-projects.vercel.app/)
+[🔗 Live Website](https://elevate-ventures-ems.vercel.app/)
 
 ---
 
