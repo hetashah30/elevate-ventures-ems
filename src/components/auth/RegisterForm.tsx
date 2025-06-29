@@ -85,7 +85,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleForm }) => {
   }
 
   return (
-    <form className="mt-8 space-y-20" onSubmit={handleSubmit}>
+    <form className="space-y-10" onSubmit={handleSubmit}>
       {error && (
         <div className="rounded-md bg-red-50 p-4">
           <div className="text-sm text-red-700">{error}</div>
