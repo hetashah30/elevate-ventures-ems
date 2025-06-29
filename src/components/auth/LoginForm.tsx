@@ -40,7 +40,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onToggleForm }) => {
   };
 
   return (
-    <form className="space-y-20" onSubmit={handleSubmit}>
+    <form className="space-y-10" onSubmit={handleSubmit}>
       {error && (
         <div className="rounded-md bg-red-50 p-4">
           <div className="text-sm text-red-700">{error}</div>
