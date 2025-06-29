@@ -6,9 +6,11 @@ import Index from "./pages/Index";
 import Gallery from "./pages/Gallery";
 import Apply from "./pages/Apply";
 import NotFound from "./pages/NotFound";
+import ScrollToTop from "@/components/ScrollToTop";
 
 const App = () => (
   <BrowserRouter>
+    <ScrollToTop />
     <AuthProvider>
       <Routes>
         <Route path="/" element={<Index />} />
